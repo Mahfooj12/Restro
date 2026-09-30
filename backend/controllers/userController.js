@@ -57,11 +57,13 @@ const login = async (req, res, next) => {
             return next(error);
         }
 
-        const accessToken = jwt.sign({_id: isUserPresent._id}, config.accessTokenSecret, {
-            expiresIn : '1d'
-        });
+        const accessToken = jwt.sign(
+            { _id: isUserPresent._id }, 
+            config.accessTokenSecret, 
+            { expiresIn: '1d' }
+        );
 
-        res.cookie("token", token, {
+        res.cookie("token", accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
@@ -93,7 +95,7 @@ const getUserData = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try {
         
-        res.clearCookie('accessToken');
+        res.clearCookie('token');
         res.status(200).json({success: true, message: "User logout successfully!"});
 
     } catch (error) {
