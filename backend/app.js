@@ -4,29 +4,48 @@ const config = require("./config/config");
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+
 const app = express();
 
+// ✅ Trust proxy for Render
+app.set("trust proxy", 1);
 
-const PORT = config.port;
+const PORT = process.env.PORT || config.port || 8000;
 connectDB();
 
-app.set("trust proxy", 1);
-// Middlewares
+// ✅ CORS with multiple Vercel URLs allowed
 app.use(cors({
     credentials: true,
-    origin: [
-        'http://localhost:5173',
-        process.env.FRONTEND_URL
-    ].filter(Boolean)
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'https://restro-plum-six.vercel.app',
+            'https://restro-md-b744.vercel.app'
+        ];
+        
+        // Allow requests with no origin (like Postman/mobile apps)
+        // and allow all Vercel deployments
+        if (
+            !origin || 
+            allowedOrigins.includes(origin) || 
+            origin.endsWith('.vercel.app')
+        ) {
+            callback(null, true);
+        } else {
+            console.log('❌ CORS blocked:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
 }));
-app.use(express.json()); // parse incoming request in json format
-app.use(cookieParser())
 
+app.use(express.json());
+app.use(cookieParser());
 
 // Root Endpoint
-app.get("/", (req,res) => {
-    res.json({message : "Hello from POS Server!"});
-})
+app.get("/", (req, res) => {
+    res.json({ message: "Hello from POS Server!" });
+});
 
 // Other Endpoints
 app.use("/api/user", require("./routes/userRoute"));
@@ -37,8 +56,7 @@ app.use("/api/payment", require("./routes/paymentRoute"));
 // Global Error Handler
 app.use(globalErrorHandler);
 
-
 // Server
 app.listen(PORT, () => {
     console.log(`☑️  POS Server is listening on port ${PORT}`);
-})
+});
