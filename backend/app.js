@@ -10,11 +10,15 @@ const app = express();
 const PORT = config.port;
 connectDB();
 
+app.set("trust proxy", 1);
 // Middlewares
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:5173']
-}))
+    origin: [
+        'http://localhost:5173',
+        process.env.FRONTEND_URL
+    ].filter(Boolean)
+}));
 app.use(express.json()); // parse incoming request in json format
 app.use(cookieParser())
 
