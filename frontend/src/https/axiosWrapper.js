@@ -9,7 +9,7 @@ const defaultHeader = {
 console.log("🔍 Backend URL =", import.meta.env.VITE_API_URL);
 
 export const axiosWrapper = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,  // ✅ VITE_API_URL use karein
+  baseURL: import.meta.env.VITE_API_URL || "",  // ✅ Ab empty — same origin use karega
   withCredentials: true,
   headers: { ...defaultHeader },
 });

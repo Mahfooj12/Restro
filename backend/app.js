@@ -16,27 +16,10 @@ connectDB();
 // ✅ CORS with multiple Vercel URLs allowed
 app.use(cors({
     credentials: true,
-    origin: function (origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:5173',
-            'http://localhost:3000',
-            'https://restro-plum-six.vercel.app',
-            'https://restro-md-b744.vercel.app'
-        ];
-        
-        // Allow requests with no origin (like Postman/mobile apps)
-        // and allow all Vercel deployments
-        if (
-            !origin || 
-            allowedOrigins.includes(origin) || 
-            origin.endsWith('.vercel.app')
-        ) {
-            callback(null, true);
-        } else {
-            console.log('❌ CORS blocked:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    }
+    origin: [
+        'http://localhost:5173',
+        'https://restro-plum-six.vercel.app'
+    ].filter(Boolean)
 }));
 
 app.use(express.json());
